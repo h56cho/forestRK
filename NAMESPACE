@@ -1,0 +1,41 @@
+exportPattern("^[^\\.]")
+
+### Imports ####################################################################
+
+
+## Note: These are functions that you use from other packages
+## Form: importFrom("<pkg>", "<function1>", "<function2>", ...)
+importFrom("rapportools", "is.boolean")
+import("partykit")
+importFrom("igraph", "make_empty_graph","add_edges","V","V<-","gsize","layout.reingold.tilford")
+import("ggplot2")
+import("stats")
+import("graphics")
+import("knitr")
+import("mlbench")
+
+
+
+### Exports ####################################################################
+
+## Note: These are functions from mypkg that you want to be exported, i.e.,
+##       that you want users of mypkg to use/see. All such functions need
+##       to have a corresponding manual page.
+export("y.organizer")
+export("x.organizer")
+export("criteria.calculator")
+export("criteria.after.split.calculator")
+export("cutoff.node.and.covariate.index.finder")
+export("construct.treeRK")
+export("ends.index.finder")
+export("pred.treeRK")
+export("draw.treeRK")
+export("bstrap")
+export("forestRK")
+export("pred.forestRK")
+export("get.tree.forestRK")
+export("var.used.forestRK")
+export("mds.plot.forestRK")
+export("importance.forestRK")
+export("importance.plot.forestRK")
+
