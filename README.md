@@ -16,3 +16,7 @@ For more details about individual functions, please see the forestRK documentati
   Documentation files (.Rd) can be found under 'man' folder.
   
   Vignette RMarkdown file can be found under the 'vignette' folder.
+  
+The file 'forestRK58 (CRAN CHECK).R' contains all forestRK functions in a single file; 
+
+At the end of this file 'forestRK58 (CRAN CHECK).R' you will also find example codes for implementing the forestRK functions to 'Soybean','iris', and 'BostonHousing2' dataset which are readily available on R.
