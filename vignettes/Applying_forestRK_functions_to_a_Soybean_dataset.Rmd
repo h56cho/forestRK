@@ -1,0 +1,592 @@
+---
+title: 'Applying forestRK Package To The Soybean Dataset'
+author: Hyunjin Cho
+date: '`r Sys.Date()`'
+output:
+  rmarkdown::html_vignette:
+vignette: >
+  %\VignetteIndexEntry{forestRK}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+<!-- Setup -->
+```{r knitr_options, echo = FALSE, results = "hide", purl = FALSE}
+## Knitr options; see https://yihui.name/knitr/options/ and
+## https://cran.r-project.org/web/packages/knitr/vignettes/knitr-refcard.pdf
+library(knitr)
+if(packageVersion("knitr") >= "1.22.8") { # for hook_mogrify
+    knit_hooks$set(crop = hook_mogrify) # use PNG crop device if chunks have crop = TRUE
+    opts_chunk$set(crop = TRUE, # always crop (no need to use in all chunks separately)
+                   fig.path = "") # put figures in .; use 'fig_' as chunk labels inside figure environments => file name fig_*
+}
+```
+
+
+```{r, message = FALSE}
+# set seed
+set.seed(3672)
+
+library(forestRK)
+library(mlbench)
+```
+
+In this vignette, we demonstrate the implementation of __forestRK__ functions 
+to a dataset other than the __iris__ dataset.
+
+For the demonstration, we will work with the __Soybean__ dataset from the 
+package __mlbench__. The __Soybean__ dataset contains 26 nominal 
+(categorical) attributes of 683 different soybeans for its input; the output of 
+the dataset is the 19 different class labels of the soybeans. 
+
+```{r setup, echo = TRUE}
+data(Soybean)
+dim(Soybean)
+levels(Soybean$Class)
+head(Soybean)
+summary(Soybean)
+```
+
+## 1. Data Cleaning
+
+The very first thing that we want to do before implementing __forestRK__ 
+functions is the proper data cleaning. The functions __y.organizer__ and 
+__x.organizer__ were made for these data cleaning tasks. To be more specific,
+we need to follow the following data cleaning procedures:
+
+1. Remove all NAs and NaNs from the original dataset, as __forestRK__ 
+functions will throw an error if the data contains any missing records.
+
+2. Seperate the dataset into a chunk that stores covariates of all training and 
+test observations ( __X__ ) and a vector that stores class types of the 
+training observations ( __y__ ).
+
+3. Numericize the data frame __X__ by applying the __x.organizer__, and 
+seperate __X__ into a training and a test set as needed.
+
+4. Numericize the vector __y__ from the training set by applying the 
+__y.organizer__ function. The attribute __y.new__ of the 
+__y.organizer__ output contains the numericized class types of the training
+observations.
+
+These steps are outlined in the example code below; note that we are going to 
+perform a Binary Encoding onto the categorical covariates of __Soybean__ 
+dataset. When __K__, the number of covariates that we consider at each split
+is fixed, __Binary Encoding__ is known to be effective for the dataset that has 
+categorical features with cardinality greater than 1000, and when the 
+cardinality of categorical feature is less than 1000, __Numeric Encoding__ is known
+to perform better than the __Binary Encoding__. For more information about Binary 
+and Numeric Encoding, please visit the website: 
+
+https://medium.com/data-design/visiting-categorical-features-and-encoding-in-decision-trees-53400fa65931
+
+The cardinality of __Soybean__ covariates are definately less than 1000, but 
+we implement both __Numeric__ and __Binary Encoding__ just to give an example.
+
+```{r, echo = TRUE}
+# Step 1: Remove all NA's and NaN's from the original dataset
+Soybean <- na.omit(Soybean)
+
+# Step 2: Seperate the dataset into a chunk that stores covariates of both 
+# training and test observations X and a vector y that stores class types of the 
+# training observations
+vec <- seq.int(1,562, by=3) # indices of the training observations
+X <- Soybean[,2:36]
+y <- Soybean[vec,1]
+
+# Step 3: Numericize the data frame X by applying the x.organizer function
+# and split X into a training and a test set
+X1 <- x.organizer(X, encoding = "bin") # Binary Encoding applied
+X2 <- x.organizer(X, encoding = "num") # Numeric Encoding applied
+
+## train and test set from the Binary Encoding
+x.train1 <- X1[vec,]
+x.test1 <- X1[-vec,]
+
+## train and test set from the Numeric Encoding
+x.train2 <- X2[vec,]
+x.test2 <- X2[-vec,]
+
+# Step 4: Numericize the vector y by applying the y.organizer function
+y.train <- y.organizer(y)$y.new # a vector storing the numericized class type
+y.factor.levels <- y.organizer(y)$y.factor.levels
+```
+
+The lines R code below extracted directly from the __x.organizer__ function 
+implements the __Binary Encoding__:
+
+```{r, eval = FALSE}
+    
+    ## Numercize the data frame of covariates via Binary Encoding
+    
+    if(encoding == "bin"){
+        ## x.dat is the data frame containing the covariates of both training and test observations,
+        ## x.dat is one of the required input to call the x.organizer function
+        x.new <- rep(0, dim(x.dat)[1])
+        n.cov <- dim(x.dat)[2]
+        for(j in 1:n.cov){
+    		    if(!(is.factor(x.dat[,j]) || is.character(x.dat[,j]))){
+    		        x.new <- data.frame(x.new, x.dat[,j])
+    	         	colnames(x.new)[dim(x.new)[2]] <- colnames(x.dat)[j]
+    		    } # if all of the covariates in the dataset are not categorical,
+              # then the function will simply return the original numeric dataset.
+
+    		    else if(is.factor(x.dat[,j]) || is.character(x.dat[,j])){
+    			      x.bin  <- data.frame(matrix(as.integer(intToBits(as.integer(as.factor(x.dat[,j])))), ncol = 32,
+    			                           nrow = length(x.dat[,j]),byrow = TRUE)[ ,1:ceiling(log(length(unique(x.dat[,j])) + 1)/log(2))])
+    			      colnames(x.bin) <- paste(colnames(x.dat)[j], c(1:(dim(x.bin)[2])))
+    			      x.new <- data.frame(x.new, x.bin)
+    		    } # end of else if(is.factor(x.dat[,j]) || is.character(x.dat[,j]))
+        } # end of for(j in 1:n.cov)
+      
+        x.new <- x.new[,-1]
+```
+
+The chunk of R code below from the \code{x.organizer} function implements __Numeric__
+__Encoding__:
+
+```{r, eval = FALSE}
+    else if(encoding == "num"){
+        ## Convert the original data frame of covariates into a numericized one via Numeric Encoding
+        ## Numeric Encoding simply assigns an arbitrary number to each class category
+        x.new <- data.frame(data.matrix(x.dat))
+    } 
+```
+
+## 2. Building A rkTree
+
+Once the data cleaning has been performed successfully, we can start implementing
+__forestRK__ functions to construct trees, forests, and related plots.
+
+The function __construct.treeRK__ builds a single tree based on the training
+data, the minimum number of observations that the user want each end node of his
+rkTree to contain (default is 5), and the type of criteria that the user would 
+like to use (Entropy vs. Gini Index).
+
+User can specify the type of splitting criteria that he or she is going to use
+by adjusting the boolean argument __entropy__ in the function call. If 
+__entropy__ is set to __TRUE__, then the function will use the Entropy as 
+the splitting criteria; if __entropy__ is set to __FALSE__, then the 
+function will use the Gini Index as the splitting criteria.
+
+The R code below constructs a rkTree from the Binary-Encoded training data by 
+using the Gini Index as the splitting criteria, and by using 6 as the minimum 
+number of observations that its end node should contain.
+
+```{r, results = "hold"}
+tree.gini <- construct.treeRK(x.train1, y.train, min.num.obs.end.node.tree = 6, 
+                              entropy = FALSE)
+```
+
+We also make a rkTree from the Numeric-Encoded training data by using the
+Entropy as the splitting criteria, and by using 5 (default) as the minimum 
+number of observations that its end node should contain.
+
+```{r, results = "hold"}
+## default for entropy is TRUE
+## default for min.num.obs.end.node.tree is 5
+tree.entropy <- construct.treeRK(x.train2, y.train)
+```
+
+
+The formula that the function uses for computing __Entropy__ of a node is:
+\begin{align*}
+	Entropy =  \displaystyle{\sum}_{i=1}^{C} -p_{i} \dot \log_{2}(p_{i})
+\end{align*}
+, where 
+$p_{i}=$(proportion of observations from the node that falls into class i) 
+
+\newline
+The formula that the function uses for computing __Gini Index__ of a node is: 
+\begin{align*}
+	Gini =  1 - \displaystyle{\sum}_{i=1}^{C} p_{i}^{2}
+\end{align*}
+, where 
+$p_{i}=$(proportion of observations from the node that falls into class i) 
+
+\newline
+The formula that the function uses for computing the value of the splitting 
+criteria after a certain split is:
+\begin{align*}
+  E(T,X) =  \displaystyle{\sum}_{c \in X} P_{c}E_{c}
+\end{align*}
+, where 
+$P_{c}=$(proportion of number of observations contained in the child node 'c')
+$E_{c}=$(value of the splitting criteria of the child node 'c')
+
+
+If the number of observations included in the original training set is already
+less than the minimum number of observations that the user specified each end 
+node to contain, then the __construct.treeRK__ function will not perform any
+split on the original training dataset.
+
+The __construct.treeRK__ function will not perform any extra split on a child
+node if:
+
+1. the number of observations contained in the child node is less than the
+minimum number of observations that the user wants each end node to contain;
+
+2. the value of the splitting criteria of the node in question before a split
+is already 0 (i.e. the node is perfectly pure); OR
+
+3. the value of the splitting criteria of the node in question after an optimal
+split is greater than the value of the splitting criteria before the split.
+
+One of the most useful output produced by __construct.treeRK__ function is 
+the hierarchical flag. The hirarchical flag of a rktree 
+( __construct.treeRK()$flag__ ) is constructed in the following manner:
+
+1. the first entry of the flag, "r" denotes for "root" or the original training
+dataset provided by the user;
+
+2. the subsequent strings of the flag is constructed in the way that last "x"
+  denotes for the left child node of the node represented by the series of
+  characters that are before the last "x", and the last "y" denotes for the
+  right child node of the node represented by the series of characters that are
+  before the last "y". For example, if a node represented as "rx" was split, its
+  left child node would be represented as "rxx" and its right child node would be
+  represented as "rxy" somewhere down the list of the hierarchical flag.
+  
+Below is the example of hierarchical flag produced by __construct.treeRK__ 
+function: 
+
+```{r, echo = TRUE}
+tree.gini$flag 
+```
+
+By closely examining the structure of the hierarchical flag, we can do many
+useful things such as identifying where to place an edge when drawing a plot of
+the rkTree model that we constructed, etc (discussed further down the road).
+
+For more details about how to interpret __construct.treeRK__ output, please 
+see the __construct.treeRK__ section of the __forestRK__ documentation.
+
+
+## 3. Plot The rkTree
+
+Once a rkTree is built from the training data, the user can be interested in 
+plotting the tree. The __draw.treeRK__ function plots the __igraph__ diagram
+of the rkTree.
+
+```{r fig_simple_plot, echo = TRUE, fig.align = "center", fig.width = 14, fig.height = 8}
+## plotting the tree.gini rkTree obtained via construct.treeRK function
+draw.treeRK(tree.gini, y.factor.levels, font="Times", node.colour = "white", 
+            text.colour = "dark blue", text.size = 0.6, tree.vertex.size = 30, 
+            tree.title = "Decision Tree", title.colour = "dark green")
+```
+
+The plot should be interpreted as the following:
+
+ The rectangular nodes (or vertices) that contain " __=<__ " symbol are used to
+ describe the splitting criteria applied to that very node while constructing
+ the __rktree__; for example, if a rectangle (which represents an individual 
+ node) has the label " __date.1 =< 1.6__ ", this would indicate that this node was 
+ split into a chunk that contains observations with the value of the covariate 
+ __date.1__ is less than or equal to 1.6 and a chunk that contains
+ observations with their __date.1__ values greater than 1.6, while the rkTree
+ was built.
+
+ Any other rectangular nodes (or vertices) that do not contain the " __=<__ " symbol
+ indicate that we have reached an end node, and the text displayed in such node
+ is the actual name of the class type that the rkTree model assigns to the
+ observations belonging to that node; for example, the rectangle (again, a node) 
+ with the label " __diaporthe-stem-canker__ " indicates that the rkTree in question 
+ assigns the class type " __diaporthe-stem-canker__ " to all observations that belong 
+ to that particular node.
+
+The hardest part of making this function is to determine where the edges should
+be placed in the rkTree diagram. The basic algorithm is the following: 
+
+if the substring of the current flag before the very last character matches exactly 
+with the entire string of the one of the previous flags, and if the length of 
+the current flag is greater than the length of the previous flag by 1 character,
+this means that when we draw the diagram of this rkTree, we should place an 
+edge between the node that is represented by the current flag and the node that
+is represented by the previous flag. This makes senses since those criteria that
+I just described wouldn't be satisfied unless the node represented by the 
+current flag is a direct child node of the node that is represented by the 
+previous flag.
+
+The R code below, which I extracted from the __draw.treeRK__ function 
+implements this edge-placing algorithm:
+
+```{r, echo = TRUE, eval = FALSE}
+    ## Make edges
+    for(i in 1:(length(f)-1)){
+        branch <- f[i]
+
+        for (j in (i+1):(length(f))){
+            ch <- f[j]
+            if ((substr(ch,1,nchar(branch))==branch) && (nchar(ch)==(nchar(branch)+1))){ed <- c(ed,i,j)}
+        }
+    }
+
+    # creating empty graph (i.e. a graph with no edges)
+    i.graph <- make_empty_graph(length(unlist(tr$flag)), directed = T) 
+    # adding edges onto the empty graph
+    i.graph <- add_edges(i.graph, ed) 
+```
+
+## 4. Make Predictions Based On A rkTree
+
+Users may want to make predictions on the test observations based on the rkTree 
+that he or she constructed by using __construct.treeRK__ function; the 
+function __pred.treeRK__ was made to perform this task.
+
+```{r, echo = TRUE}
+## display numericized predicted class type for the first 5 observations (in the 
+## order of increasing original observation index number) from the test set with
+## Binary Encoding
+prediction.df <- pred.treeRK(X = x.test1, tree.gini)$prediction.df
+prediction.df[1:5, dim(prediction.df)[2]]
+
+## display the list of hierarchical flag from the test set with Numeric Encoding
+pred.treeRK(X = x.test2, tree.entropy)$flag.pred
+```
+
+__prediction.df__ a data frame of test observations their predicted class 
+type that is returned by the __pred.treeRK__ function. If 
+__prediction.df__ has __n__ columns, the first __n-1__ columns will 
+contain the numericized covariates of the test observations, and the very last 
+__n__-th column will contain the predicted numericized class type for each of
+those test observations. Users of this function may be interested in identifying 
+the original name of the numericized predicted class type shown in the last 
+column of data frame __prediction.df__. This can easily be done by extracting 
+the attribute __y.factor.levels__ from the __y.organizer__ object. For 
+example, if the data frame __prediction.df__ indicates that the predicted 
+class type of the 1st test observation is "2", that means the actual name of the
+predicted class type for that 1st test observation is indicated as the 2nd 
+element of the vector __y.organizer.object$y.factor.levels__ that we can 
+obtain during the data cleaning phase.
+
+NOTE: At the end of the __pred.treeRK__ function, __the test data points in__ 
+__prediction.df are re-ordered by the increasing original row index number__
+__(the integer row index of a data point from the original dataset that the user__
+__had right before splitting them into a training and a test set) of those test__
+__observations.__ So if you shuffled the data before seperating 
+them into a training and a test set, the order of the data points in which they
+are presented under the data frame __prediction.df__ may not be same as the 
+shuffled order of data points in your test set.
+
+The __pred.treeRK__ function makes a use of the list of hierarchical flags
+generated by the __construct.treeRK__ function; the function uses the list of
+hierarchical flag as a guide to how it should split the test set to make 
+predictions. The function __pred.treeRK__ itself actually generates a list of
+hierarchical flag of its own as it splits the test set, and at the end of the 
+function __pred.treeRK__ tries to match the list of hierarchical flag it 
+generated with the list of hierarchical flag from the __construct.treeRK__ 
+function. If the two flags match exactly, then it is a good sign since this 
+would imply that the splitting on the test set was done in the manner consistent
+with how the training set was split when the rkTree in question was built.
+If there is any difference in the two flags, however, this is not a good sign
+since it would signal that the splitting on the test set has done in a different
+manner than how the splitting was done on the training set; if the mismatch
+occurs, the __pred.treeRK__ function will stop and throw an error.
+
+## 5. Generating A forestRK 
+
+But our inquiry shouldn't end with just examining a single rkTree; normally we
+would be interested in building a forest that is comprised of many trees to make
+predictions. The R code below generates __forestRK__ models based on the 
+training set, the number of bags (= number of bootstrap samples), the sample
+size for each bag, etc., that were provided by the user:
+
+```{r, echo = TRUE}
+## make a forestRK model based on the training data with Binary Encoding and with Gini Index as the splitting criteria
+## normally nbags and samp.size would be much larger than 30 and 50
+forestRK.1 <- forestRK(x.train1, y.train, nbags = 30, samp.size = 50, entropy = FALSE)
+
+## make a forestRK model based on the training data with Numeric Encoding and with Entropy as the splitting criteria
+## make a forestRK model based on the training data with Binary Encoding and with Gini Index as the splitting criteria
+## normally nbags and samp.size would be much larger than 30 and 50
+forestRK.2 <- forestRK(x.train2, y.train, nbags = 30, samp.size = 50)
+```
+
+The basic mechanism behind the __forestRK__ function is pretty simple:
+the function first generates bootstrap samples of the training dataset based on 
+the paramemters that the user provided, and then it calls the function 
+__construct.treeRK__ in order to build a rkTree on each of those bootstrap 
+samples, to form a bigger forest.
+
+## 6. Making Predictions Based On A forestRK Model 
+
+Again, the main interest of users who use the __forestRK__ package may be 
+making predictions on the test observations based on a __forestRK__ model.
+The function __pred.forestRK__ is for making predictions on the test 
+observations based on a forestRK algorithm. The R code shown below would make 
+predictions on the test observation that the user provided ( __x.test1__ ), 
+based on the __forestRK__ model that it builds on the training data 
+( __x.train1__ and __y.train1__ ) that the user specified:
+
+```{r, echo = TRUE}
+# make predictions on the test set x.test1 based on the forestRK model constructed from
+# x.train1 and y.train (recall: these are the training data with Binary Encoding)
+# after using Gini Index as splitting criteria (entropy == FALSE)
+pred.forest.rk1 <- pred.forestRK(x.test = x.test1, x.training = x.train1, 
+                                 y.training = y.train, nbags = 100, 
+                                samp.size = 100, y.factor.levels = y.factor.levels,
+                                entropy = FALSE)
+
+# make predictions on the test set x.test2 based on the forestRK model constructed from
+# x.train2 and y.train (recall: these are the training data with Numeric Encoding)
+# after using Entropy as splitting criteria (entropy == TRUE)
+pred.forest.rk2 <- pred.forestRK(x.test = x.test2, x.training = x.train2, 
+                                 y.training = y.train, nbags = 100, 
+                                 samp.size = 100, y.factor.levels = y.factor.levels, 
+                                 entropy = TRUE)
+```
+
+The basic mechanism behind __pred.forestRK__ function is the following:
+When the function is called, it calls __forestRK__ function after passing the
+user-specified training data as an argument, in order to first generate the 
+__forestRK__ object. After that, the function uses __pred.treeRK__ 
+function to make predictions on the test observations based on each individual
+tree in the __forestRK__ object. Once the individual prediction from each
+tree are obtained for all of the test observations, the function stores those 
+individual predictions under a big dataframe. Once that data frame is complete,
+then the function collapses the results by the rule of the majority votes.
+For example, for the m-th observation from the test set, if the most frequently
+predicted class type for that m-th test observation by all of the rkTrees in the
+forest is class type 'A', then by the rule of the majority votes, the 
+__pred.forestRK__ function will assign class 'A' as the predicted class type
+for that m-th test observation based on the __forestRK__ model.
+
+When I was making this function, I had an option of directly using the output of
+the  __forestRK__ function as the required input for calling 
+__pred.forestRK__; however, I decided to make the function 
+__pred.forestRK__ to generate a __forestRK__ model internally based on 
+the training data provided by the user, in order to reduce the number of 
+functions that the user is required to use to make predictions.
+
+NOTE: __pred.forestRK__ outputs ( __test.prediction.df.list__,
+, __pred.for.obs.forest.rk__, and __num.pred.for.obs.forest.rk__ ) are __generated__
+__after re-ordering test data points by the increasing original row index number__ 
+__(the integer row index of a data point from the original dataset that the user__
+__had right before splitting them into a training and a test set) of those test__ 
+__observations__. So if you shuffled the data before seperating them into a training
+and a test set, the order of the data points in which they are presented in the 
+__pred.forestRK__ outputs may not be same as the shuffled order
+of data points in your test set.
+
+## 7. Extracting Individual Tree(s) From The forestRK Object
+
+The users may be interested in examining the structure of an individual tree(s)
+that is contained within the __forestRK__ object. The functions 
+__get.tree.forestRK__ and __var.used.forestRK__ help with this type of
+tasks. __get.tree.forestRK__ is used to extract information about a 
+particular tree(s) that is contained in the __forestRK__. The function 
+__var.used.forestRK__ is used to extract the list of names of the covariates
+that were used at each split while that particular rkTree was built. The R 
+code shown below demonstrate the use of __get.tree.forestRK__ and 
+__var.used.forestRK__ functions:
+
+```{r, echo = TRUE, eval = FALSE}
+## get tree
+tree.index.ex <- c(1,3,8)
+# extract information about the 1st, 3rd, and 8th tree in the forestRK.1
+get.tree <- get.tree.forestRK(forestRK.1, tree.index = tree.index.ex)
+# display 8th tree in the forest (which is the third element of the vector 'tree.index.ex')
+get.tree[["8"]]
+
+## get the list of variable used for splitting
+covariate.used.for.split.tree <- var.used.forestRK(forestRK.1, tree.index = c(4,5,6))
+# get the list of names of covariates used for splitting to construct tree #6 in the forestRK.1
+covariate.used.for.split.tree[["6"]]
+```
+
+The __var.used.forestRK__ lists the actual name of the covariate used for a 
+split (not their numericized ones), consistent to the exact order of the split; for 
+instance, the 1st element of the vector 
+__covariate.used.for.split.tree[["6"]]__ from the example above is the 
+covariate on which the 1st split had occured while the 6th tree in the
+__forestRK.1__ object was built.
+
+
+## 8. Other Useful Functions From ForestRK
+
+- __mds.plot.forestRK__ function generates 2-dimensional Multi-Dimensional 
+Scaling (MDS) plot of the test observations, and colour codes each test 
+observation by their predicted class type. Already existing R functions 
+__dist__ and __cmdscale__ were used in this function to compute the Multi-
+Dimensional Scales of the test data. The R code below demonstrates how to use
+this function:
+
+```{r, echo = TRUE, fig.align = "center", fig.width = 12, fig.height = 6}
+## Generate 2-dimensional MDS plot of the test observations colour coded by the 
+## predictions stored under the object pred.forest.rk1
+mds.plot.forestRK(pred.forest.rk1, plot.title = "My Title", xlab ="1st Coordinate", 
+                  ylab = "2nd Coordinate", colour.lab = "Predictions By The forestRK.1")
+```
+
+- __importance.forestRK__ function calculates the Gini Importance (sometimes
+also known as Mean Decrease in Impurity) of each covariate that we consider in 
+the __forestRK__ model that the user provided, and lists the covariate names
+and values in the order of most important to the least important. The Gini 
+Importance algorithm is also used in 'scikit-learn'. 
+
+Gini Importance is defined as the total decrease in node impurity averaged over 
+all trees of the ensemble, where the decrease in node impurity is obtained after
+weighting by the probability for an observation to reach that node (which is 
+approximated by the proportion of samples reaching that node).
+
+The R code below illustrates how to use __importance.forestRK__ function:
+
+```{r, echo = TRUE, eval = TRUE}
+## Generate 2-dimensional MDS plot of the test observations colour coded by the 
+## predictions stored under the object pred.forest.rk1
+imp <- importance.forestRK(forestRK.1)
+
+# gives the list of covariate names ordered from most important to least important
+covariate.names <- imp$importance.covariate.names 
+
+# gives the list of average decrease in (weighted) node impurity across all trees in the forest
+# ordered from the highest to lowest in value.
+# that is, the first element of this vector pertains to the first covariate listed under
+# imp$importance.covariate.names 
+ave.decrease.criteria <- imp$average.decrease.in.criteria.vec
+```
+
+- __importance.plot.forestRK__ function takes __importance.forestRK__ 
+function as an input and generates an Importance Plot based on the Gini 
+Importance of each covariates. The covariates are ordered from the one with the 
+highest importance to the one with the lowest importance. The R code below 
+demonstrates an example for using the __importance.plot.forestRK__ function:
+
+```{r, echo = TRUE, fig.align = "center", fig.width = 12, fig.height = 6}
+## Generate importance plot of the forestRK.1 object
+p <- importance.plot.forestRK(imp, colour.used="dark green", fill.colour="dark green", label.size=8)
+
+p
+```
+
+## 9. Comparing Performances Of Different Types of Encodings and Splitting Criteria
+
+At times users may want to compare the overall performances of different types 
+of encodings (Numeric vs. Binary) and splitting criteria (Entropy vs. Gini Index)
+by the predictive power of their __forestRK__ models.
+
+The R code below shows how to compare the __forestRK__ models with different
+encodings and splitting criterias:
+
+```{r, fig.align = "center", fig.width = 12, fig.height = 6, echo = TRUE}
+## overall prediction accuracy (in percentage) when training data was modified with Binary Encoding
+## and the Gini Index was used as splitting criteria.
+y.test <- Soybean[-vec,1]
+sum(as.vector(pred.forest.rk1$pred.for.obs.forest.rk) == as.vector(y.test)) * 100 / length(y.test)
+
+## overall prediction accuracy (in percentage) when training data was modified with numeric Encoding
+## and the Entropy was used as splitting criteria.
+y.test <- Soybean[-vec,1]
+sum(as.vector(pred.forest.rk2$pred.for.obs.forest.rk) == as.vector(y.test)) * 100 / length(y.test)
+
+### NOTE: IF YOU SHUFFLED THE DATA before dividing them into a training and a test
+###       set, since the observations in pred.forest.rk1 and pred.forest.rk2 are
+###       re-ordered by the increasing original observation index number,
+###       the order of the test data points presented in pred.forest.rk objects
+###       may not be same as the shuffled order of your original test set.
+###       In this case, you have to reorder the vector y.test in the order of 
+###       increasing observation number before you make the comparison.
+###       In this case, simply do:
+###       
+###       names(y.test) <- rownames(x.test)
+###       sum(as.vector(pred.forest.rk$pred.for.obs.forest.rk) == 
+###           as.vector(y.test[order(as.numeric(names(y.test)))])) / length(y.test)
