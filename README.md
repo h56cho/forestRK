@@ -12,5 +12,7 @@ The package forestRK is based on:
 For more details about individual functions, please see the forestRK documentation.
 
   R files for individual functions (.R) can be found under 'R' folder.
+  
   Documentation files (.Rd) can be found under 'man' folder.
+  
   Vignette RMarkdown file can be found under the 'vignette' folder.
