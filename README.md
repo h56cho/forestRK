@@ -10,3 +10,7 @@ The package forestRK is based on:
   https://stats.stackexchange.com/questions/168964/building-a-regression-tree-with-r-from-scratch/168967#168967
 
 For more details about individual functions, please see the forestRK documentation.
+
+R files for individual functions (.R) can be found under 'R' folder.
+Documentation files (.Rd) can be found under 'man' folder.
+Vignette RMarkdown file can be found under the 'vignette' folder.
