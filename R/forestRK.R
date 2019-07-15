@@ -2,28 +2,41 @@
 ##'
 ##' @author Hyunjin Cho, Rebecca Su
 ##' @title Builds up a random forest RK onto the given (training) dataset.
-##' @param X a numericized data frame storing covariates of each observation from the given (training) dataset (obtained via x.organizer()); X should contain no NA or NaN's.
-##' @param Y.new a vector storing the numericized class types of each observation from the given (training) dataset X; Y.new should contain no NA or NaN's.
-##' @param min.num.obs.end.node.tree the minimum number of observations that we want each of our end node of our tree to contain. Default is set to 5.
+##' @param X a numericized data frame storing covariates of each observation
+##'          from the given (training) dataset (obtained via x.organizer());
+##'          X should contain no NA or NaN's.
+##' @param Y.new a vector storing the numericized class types of each observation
+##'              from the given (training) dataset X; Y.new should contain no NA
+##'              or NaN's.
+##' @param min.num.obs.end.node.tree the minimum number of observations that we
+##'                                  want each of our end node of our tree to contain.
+##'                                  Default is set to 5.
 ##' @param nbags number of bootstrap samples that we want to generate.
-##' @param samp.size number of samples that we want each of our bootstrap samples to contain.
-##' @param entropy TRUE if we use entropy as the splitting criteria; FALSE if we use the gini index for the splitting criteria. Default is set to TRUE.
+##' @param samp.size number of samples that we want each of our bootstrap samples
+##'                  to contain.
+##' @param entropy TRUE if we use entropy as the splitting criteria;
+##'                FALSE if we use the gini index for the splitting criteria.
+##'                Default is set to TRUE.
 ##' @return The original dataset used to construct the random forest RK (X).
 ##' @return A list of trees in the generated random forest RK (forest.rk.tree.list).
-##' @return A list containing data frames of bootstrap samples that were generated from the dataset X (bootsamp.list).
+##' @return A list containing data frames of bootstrap samples that were generated
+##'         from the dataset X (bootsamp.list).
 ##' @return The value of the parameter 'entropy' (ent.status).
 ##' @examples
 ##' ## example: iris dataset
 ##' ## load the forestRK package
 ##' library(forestRK)
 ##'
-##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),] # covariates of training data set
+##' # covariates of training data set
+##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),]
 ##' y.train <- y.organizer(iris[c(1:25,51:75,101:125),5])$y.new
 ##'
 ##' # Implement forestRK function
-##' # min.num.obs.end.node.tree is set to 5 by default; entropy is set to TRUE by default
+##' # min.num.obs.end.node.tree is set to 5 by default;
+##' # entropy is set to TRUE by default
 ##' forestRK.1 <- forestRK(x.train, y.train, nbags = 100, samp.size = 100)
-##' forestRK.1.tree <- forestRK(x.train, y.train, min.num.obs.end.node.tree = 6, nbags = 100, samp.size = 100, entropy = FALSE)$forest.rk.tree.list[[1]]
+##' forestRK.1.tree <- forestRK(x.train, y.train, min.num.obs.end.node.tree = 6,
+##'                             nbags = 100, samp.size = 100, entropy = FALSE)$forest.rk.tree.list[[1]]
 forestRK <- function(X = data.frame(), Y.new = c(), min.num.obs.end.node.tree = 5, nbags, samp.size, entropy = TRUE){
 
     ## Import the rapportools package
@@ -76,4 +89,4 @@ forestRK <- function(X = data.frame(), Y.new = c(), min.num.obs.end.node.tree = 
 
     # Return the results
     results
-}      
+}

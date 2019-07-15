@@ -1,30 +1,47 @@
 ##' A construct.treeRK function
 ##'
 ##' @author Hyunjin Cho, Rebecca Su
-##' @title Constructs a classification tree based on the dataset of interest by implementing the RK (Random 'K') algorithm.
-##' @param x.train a numericized data frame (obtained after applying x.organizer) of covariates of the dataset of interest (typically the training set) that we had before any splitting took place. x.train should contain no NA or NaN's.
-##' @param y.new.train a numericized class types of the observations of the dataset of interest (typically the training set) that we had before any splitting took place. y.new.train should contain no NA or NaN's.
-##' @param min.num.obs.end.node.tree the minimum number of observations that we want each of the end nodes of our tree to contain. Default is set to '5'.
-##' @param entropy TRUE if Entropy is used as the splitting criteria; FALSE if Gini Index is used as the splitting criteria. Default is set to TRUE.
+##' @title Constructs a classification tree based on the dataset of interest by
+##'        implementing the RK (Random 'K') algorithm.
+##' @param x.train a numericized data frame (obtained after applying x.organizer)
+##'                of covariates of the dataset of interest (typically the training set)
+##'                that we had before any splitting took place. x.train should contain
+##'                no NA or NaN's.
+##' @param y.new.train a numericized class types of the observations of the
+##'                    dataset of interest (typically the training set) that we
+##'                    had before any splitting took place. y.new.train should
+##'                    contain no NA or NaN's.
+##' @param min.num.obs.end.node.tree the minimum number of observations that we
+##'                                  want each of the end nodes of our tree to
+##'                                  contain. Default is set to '5'.
+##' @param entropy TRUE if Entropy is used as the splitting criteria;
+##'                FALSE if Gini Index is used as the splitting criteria.
+##'                Default is set to TRUE.
 ##' @return vector of names of all covariate (covariate.names).
 ##' @return length of the flag (l).
-##' @return a list containing children nodes of the numericized data frame x.train (x.node.list).
-##' @return a list containing children nodes of the numericized vector of class type y.new.train (y.new.node.list).
+##' @return a list containing children nodes of the numericized data frame x.train
+##'         (x.node.list).
+##' @return a list containing children nodes of the numericized vector of class
+##'         type y.new.train (y.new.node.list).
 ##' @return hierchical flag (flag).
 ##' @return a matrix that lists the covariates used for splitting (covariate.split).
 ##' @return a vector that lists the values at which the node was split (value.at.split).
-##' @return a matrix that lists the amount of decrease in splitting criteria after each split (amt.decrease.criteria).
-##' @return a matrix that lists the number of observation in each parent node right before each split (num.obs)
+##' @return a matrix that lists the amount of decrease in splitting criteria
+##'         after each split (amt.decrease.criteria).
+##' @return a matrix that lists the number of observation in each parent node
+##'         right before each split (num.obs)
 ##' @examples
 ##' ## example: iris dataset
 ##' ## load the forestRK package
 ##' library(forestRK)
 ##'
-##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),] # covariates of training data set
+##' # covariates of training data set
+##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),]
 ##' y.train <- y.organizer(iris[c(1:25,51:75,101:125),5])$y.new
 ##'
 ##' # Construct a tree
-##' # min.num.obs.end.node.tree is set to 5 by default; entropy is set to TRUE by default
+##' # min.num.obs.end.node.tree is set to 5 by default;
+##' # entropy is set to TRUE by default
 ##' tree.entropy <- construct.treeRK(x.train, y.train)
 ##' tree.gini <- construct.treeRK(x.train, y.train, min.num.obs.end.node.tree = 6, entropy = FALSE)
 ##' tree.entropy$covariate.names

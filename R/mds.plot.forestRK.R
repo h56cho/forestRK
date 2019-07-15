@@ -1,25 +1,34 @@
 ##' A mds.plot.forestRK function
 ##'
 ##' @author Hyunjin Cho, Rebecca Su
-##' @title Makes 2D mds (multidimensional scaling) ggplot of the test observations based on the predictions from a forestRK model.
+##' @title Makes 2D mds (multidimensional scaling) ggplot of the test observations
+##'        based on the predictions from a forestRK model.
 ##' @param pred.forestRK.object a pred.forestRK() object.
-##' @param plot.title an user specified title for the mds plot; the default is "MDS Plot of Dataset Colour Coded by Forest RK Model Predictions".
+##' @param plot.title an user specified title for the mds plot;
+##'                   the default is
+##'                   "MDS Plot of Test Data Colour Coded by Forest RK Model Predictions".
 ##' @param xlab label for the x-axis of the plot; the default is "First Coordinate".
 ##' @param ylab label for the y-axis of the plot; the default is "Second Coordinate".
-##' @param colour.lab label title for the legend that specifies categories for each colour; the default is "Predictions By The Random Forest RK Model".
-##' @return a multidimensional scaling ggplot (2D) of the test observations, colour coded by their predicted class types.
+##' @param colour.lab label title for the legend that specifies categories for
+##'                   each colour; the default is
+##'                   "Predictions By The Random Forest RK Model".
+##' @return a multidimensional scaling ggplot (2D) of the test observations,
+##'         colour coded by their predicted class types.
 ##' @examples
 ##' ## example: iris dataset
 ##' ## load the forestRK package
 ##' library(forestRK)
 ##'
-##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),] # covariates of training data set
-##' x.test <- x.organizer(iris[,1:4], encoding = "num")[c(26:50,76:100,126:150),] # covariates of test dataset
+##' # covariates of training data set
+##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),]
+##' # covariates of test dataset
+##' x.test <- x.organizer(iris[,1:4], encoding = "num")[c(26:50,76:100,126:150),]
 ##' y.train <- y.organizer(iris[c(1:25,51:75,101:125),5])$y.new
 ##' y.factor.levels <- y.organizer(iris[c(1:25,51:75,101:125),5])$y.factor.levels
 ##'
 ##' # min.num.obs.end.node.tree is set to 5 by default; entropy is set to TRUE by default
-##' pred.forest.rk <- pred.forestRK(x.test = x.test, x.training = x.train, y.training = y.train, nbags = 100, samp.size = 50, y.factor.levels = y.factor.levels)
+##' pred.forest.rk <- pred.forestRK(x.test = x.test, x.training = x.train, y.training = y.train,
+##'                                 nbags = 100, samp.size = 50, y.factor.levels = y.factor.levels)
 ##'
 ##' #generate a classical mds plot and colour code by the predicted class
 ##' mds.plot.forestRK(pred.forest.rk)

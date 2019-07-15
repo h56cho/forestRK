@@ -3,17 +3,21 @@
 ##' @author Hyunjin-Dominique Cho, Rebecca Su
 ##' @title Identifies numerical indices of the end nodes of a rktree.
 ##' @param tr.flag a construct.treeRK()$flag object or a similar flag matrix.
-##' @return A vector that lists the indices of the end nodes of a given rktree (indices that corresponds to the indices in x.node.list and y.new.node.list that is returned by the construct.treeRK function).
+##' @return A vector that lists the indices of the end nodes of a given rktree
+##'         (indices that corresponds to the indices in x.node.list and
+##'         y.new.node.list that is returned by the construct.treeRK function).
 ##' @examples
 ##' ## example: iris dataset
 ##' ## load the forestRK package
 ##' library(forestRK)
 ##'
-##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),] # covariates of training data set
+##' # covariates of training data set
+##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),]
 ##' y.train <- y.organizer(iris[c(1:25,51:75,101:125),5])$y.new
 ##'
 ##' # Construct a tree
-##' # min.num.obs.end.node.tree is set to 5 by default; entropy is set to TRUE by default
+##' # min.num.obs.end.node.tree is set to 5 by default;
+##' # entropy is set to TRUE by default
 ##' tree.entropy <- construct.treeRK(x.train, y.train)
 ##'
 ##' # Find indices of end nodes of tree.entropy

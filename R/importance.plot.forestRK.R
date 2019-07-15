@@ -1,10 +1,13 @@
 ##' An importance.plot.forestRK function
 ##'
 ##' @author Hyunjin Cho, Rebecca Su
-##' @title Generates importance plot of the covariates considered in the forestRK model.
+##' @title Generates importance plot of the covariates considered in the forestRK
+##'        model.
 ##' @param importance.forestRK.object an importance.forestRK() object.
-##' @param colour.used colour used for the border of the importance plot; default is "dark green".
-##' @param fill.colour colour used to fill the bars of the importance plot; default is "dark green".
+##' @param colour.used colour used for the border of the importance plot;
+##'                    default is "dark green".
+##' @param fill.colour colour used to fill the bars of the importance plot;
+##'                    default is "dark green".
 ##' @param label.size size of the labels; default is set to 10.
 ##' @return an importance plot of the covariates considered in the forestRK model.
 ##' @examples
@@ -16,7 +19,8 @@
 ##' y.train <- y.organizer(iris[c(1:25,51:75,101:125),5])$y.new
 ##'
 ##' # random forest
-##' # min.num.obs.end.node.tree is set to 5 by default; entropy is set to TRUE by default
+##' # min.num.obs.end.node.tree is set to 5 by default;
+##' # entropy is set to TRUE by default
 ##' forestRK.1 <- forestRK(x.train, y.train,nbags=100, samp.size=100)
 ##' # execute forestRK.importance function
 ##' imp <- importance.forestRK(forestRK.1)
@@ -43,7 +47,7 @@ importance.plot.forestRK <- function(importance.forestRK.object = importance.for
     average.decrease.in.criteria.vec <- importance.forestRK.object$average.decrease.in.criteria.vec
     importance.covariate.names.vec <- importance.forestRK.object$importance.covariate.names
     average.decrease.in.criteria.df <- as.data.frame(average.decrease.in.criteria.vec, row.names = importance.covariate.names.vec)
-    g <- ggplot(average.decrease.in.criteria.df, aes(x=reorder(row.names(average.decrease.in.criteria.df),average.decrease.in.criteria.vec),y=average.decrease.in.criteria.vec)) + theme_grey(base_size = label.size) + coord_flip() 
+    g <- ggplot(average.decrease.in.criteria.df, aes(x=reorder(row.names(average.decrease.in.criteria.df),average.decrease.in.criteria.vec),y=average.decrease.in.criteria.vec)) + theme_grey(base_size = label.size) + coord_flip()
     g2 <- g + geom_bar(stat = "identity", color=colour.used, fill = fill.colour) + theme(legend.position = "top") + labs(x="Covariate Names", y="Average Decrease in Splitting Criteria", title = paste("Importance Plot Based On The Splitting Criteria", ent.label))
 
     ## 3) Return the importance plot

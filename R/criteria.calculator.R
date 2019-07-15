@@ -1,18 +1,27 @@
 ##' A criteria.calculator function
 ##'
 ##' @author Hyunjin Cho, Rebecca Su
-##' @title Calculates Entropy or Gini Index of a particular node before (or without) a split.
-##' @param x.node numericized data frame (obtained via x.organizer()) of covariates of a particular node before (or without) a split; x.node should contain no NA or NaN's.
-##' @param y.new.node numericized vector of class type (y) of a particular node before (or without) splitting it; y.new.node should contain no NA or NaN's.
-##' @param entropy TRUE if entropy is used as the splitting criteria; FALSE if gini index is used as the splitting criteria. Default is set to TRUE.
+##' @title Calculates Entropy or Gini Index of a particular node before (or without)
+##'        a split.
+##' @param x.node numericized data frame (obtained via x.organizer()) of
+##'               covariates of a particular node before (or without) a split;
+##'               x.node should contain no NA or NaN's.
+##' @param y.new.node numericized vector of class type (y) of a particular node
+##'                   before (or without) splitting it; y.new.node should contain
+##'                   no NA or NaN's.
+##' @param entropy TRUE if entropy is used as the splitting criteria; FALSE if
+##'                gini index is used as the splitting criteria. Default is set
+##'                to TRUE.
 ##' @return the Entropy or the Gini Index of a particular node (criteria).
 ##' @return logical value (TRUE or FALSE) of the parameter 'entropy' (ent.status).
 ##' @examples
 ##' ## example: iris dataset
 ##' library(forestRK) # load the package forestRK
 ##'
-##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),] # covariates of training data set
-##' y.train <- y.organizer(iris[c(1:25,51:75,101:125),5])$y.new # numericized class types of observations of training dataset
+##' # covariates of training data set
+##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),]
+##' # numericized class types of observations of training dataset
+##' y.train <- y.organizer(iris[c(1:25,51:75,101:125),5])$y.new
 ##'
 ##' ## criteria.calculator() example
 ##' ## calculate the Entropy of the original training dataset

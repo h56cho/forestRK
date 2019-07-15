@@ -3,18 +3,22 @@
 ##' @author Hyunjin Cho, Rebecca Su
 ##' @title Extracts an individual tree structure from a forestRK object.
 ##' @param forestRK.object a forestRK() object.
-##' @param tree.index a vector of indices of the trees that we want to extract from the forestRK() object.
-##' @return A list containing forestRK trees that have their indices specified in the function argument 'tree.index'.
+##' @param tree.index a vector of indices of the trees that we want to extract
+##'                   from the forestRK() object.
+##' @return A list containing forestRK trees that have their indices specified
+##'         in the function argument 'tree.index'.
 ##' @examples
 ##' ## example: iris dataset
 ##' ## load the forestRK package
 ##' library(forestRK)
 ##'
-##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),] # covariates of training data set
+##' # covariates of training data set
+##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),]
 ##' y.train <- y.organizer(iris[c(1:25,51:75,101:125),5])$y.new
 ##'
 ##' #random forest
-##' # min.num.obs.end.node.tree is set to 5 by default; entropy is set to TRUE by default
+##' # min.num.obs.end.node.tree is set to 5 by default;
+##' # entropy is set to TRUE by default
 ##' forestRK.1 <- forestRK(x.train, y.train, nbags=100, samp.size=100)
 ##'
 ##' #get tree

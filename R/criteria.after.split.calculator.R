@@ -2,20 +2,31 @@
 ##'
 ##' @author Hyunjin Cho, Rebecca Su
 ##' @title Calculates Entropy or Gini Index of a node after a given split.
-##' @param x.node numericized data frame (obtained via x.organizer()) of covariates of a particular node that is to be split; x.node should contain no NA or NaN's.
-##' @param y.new.node numericized class type of each observation of a particular node that is to be split; y.new.node should contain no NA or NaN's.
-##' @param split.record output of the kidids_split function from the partykit package for a given split.
-##' @param entropy TRUE if Entropy is used as the splitting criteria; FALSE if Gini Index is used as the splitting criteria. Default is set to TRUE.
-##' @return The value of Entropy or Gini Index of a particular node after a given split.
+##' @param x.node numericized data frame (obtained via x.organizer()) of
+##'               covariates of a particular node that is to be split;
+##'               x.node should contain no NA or NaN's.
+##' @param y.new.node numericized class type of each observation of a particular
+##'                   node that is to be split; y.new.node should contain no NA
+##'                   or NaN's.
+##' @param split.record output of the kidids_split function from the partykit
+##'                     package for a given split.
+##' @param entropy TRUE if Entropy is used as the splitting criteria; FALSE if
+##'                Gini Index is used as the splitting criteria. Default is set
+##'                to TRUE.
+##' @return The value of Entropy or Gini Index of a particular node after a given
+##'         split.
 ##' @examples
 ##' ## example: iris dataset
 ##' library(forestRK) # load the package forestRK
 ##' library(partykit)
 ##'
-##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),] # covariates of training data set
-##' y.train <- y.organizer(iris[c(1:25,51:75,101:125),5])$y.new # numericized class types of observations of training dataset
+##' # covariates of training data set
+##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),]
+##' # numericized class types of observations of training dataset
+##' y.train <- y.organizer(iris[c(1:25,51:75,101:125),5])$y.new
 ##'
-##' ## criteria.after.split.calculator() example in the implementation of the forestRK algorithm
+##' ## criteria.after.split.calculator() example in the implementation of the
+##' ## forestRK algorithm
 ##'
 ##' ent.status <- TRUE
 ##'

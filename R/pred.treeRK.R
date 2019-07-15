@@ -2,26 +2,34 @@
 ##'
 ##' @author Hyunjin Cho, Rebecca Su
 ##' @title Makes predictions on the test dataset based on the treeRK model provided.
-##' @param X a numericized data frame (obtained via x.organizer()) storing covariates of the test dataset (or the dataset that we want to make predictions on); X should contain no NA or NaN's.
+##' @param X a numericized data frame (obtained via x.organizer()) storing
+##'          covariates of the test dataset (or the dataset that we want to make
+##'          predictions on); X should contain no NA or NaN's.
 ##' @param rktree a construct.treeRK() object.
-##' @return a data frame of test observations with the predicted class types indicated under the very last column (prediction.df).
-##' @return the flag generated from applying the rktree model to the test set (flag.pred).
+##' @return a data frame of test observations with the predicted class types
+##'         indicated under the very last column (prediction.df).
+##' @return the flag generated from applying the rktree model to the test set
+##'         (flag.pred).
 ##' @examples
 ##' ## example: iris dataset
 ##' ## load the forestRK package
 ##' library(forestRK)
 ##'
-##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),] # covariates of training data set
-##' x.test <- x.organizer(iris[,1:4], encoding = "num")[c(26:50,76:100,126:150),] # covariates of test dataset
+##' # covariates of training data set
+##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),]
+##' # covariates of test dataset
+##' x.test <- x.organizer(iris[,1:4], encoding = "num")[c(26:50,76:100,126:150),]
 ##' y.train <- y.organizer(iris[c(1:25,51:75,101:125),5])$y.new
 ##'
 ##' ## Construct a tree
 ##' # min.num.obs.end.node.tree is set to 5 by default; entropy is set to TRUE by default
 ##' tree.entropy <- construct.treeRK(x.train, y.train)
-##' tree.gini <- construct.treeRK(x.train, y.train, min.num.obs.end.node.tree = 6, entropy = FALSE)
+##' tree.gini <- construct.treeRK(x.train, y.train, min.num.obs.end.node.tree = 6,
+##'                               entropy = FALSE)
 ##'
 ##' ## Make predictions on the test set based on the constructed rktree model
-##' # last column of prediction.df stores predicted class on the test observations based on a given rktree
+##' # last column of prediction.df stores predicted class on the test observations
+##' # based on a given rktree
 ##' prediction.df <- pred.treeRK(X = x.test, tree.entropy)$prediction.df
 ##' flag.pred <- pred.treeRK(X = x.test, tree.entropy)$flag.pred
 pred.treeRK <- function(X = data.frame(), rktree = construct.treeRK()){

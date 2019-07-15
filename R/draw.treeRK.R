@@ -5,12 +5,18 @@
 ##' @param tr a construct.treeRK() object (a tree).
 ##' @param y.factor.levels a y.organizer()$y.factor.levels output.
 ##' @param font font type used in the rktree plot; default is "Times".
-##' @param node.colour colour of the node used in the rktree plot; default is "White".
-##' @param text.colour colour of the text used in the rktree plot; default is "Dark Blue".
-##' @param text.size size of the text in the rktree plot; default is 0.67.
-##' @param tree.vertex.size size of the rktree plot vertices; default is 75.
-##' @param tree.title title of the rktree plot; default title is "Diagram of a Tree".
-##' @param title.colour colour of the title of the rktree plot; default title colour is "Dark Blue".
+##' @param node.colour colour of the node used in the rktree plot;
+##'                    default is "White".
+##' @param text.colour colour of the text used in the rktree plot;
+##'                    default is "Dark Blue".
+##' @param text.size size of the text in the rktree plot;
+##'                  default is 0.67.
+##' @param tree.vertex.size size of the rktree plot vertices;
+##'                         default is 75.
+##' @param tree.title title of the rktree plot;
+##'                   default title is "Diagram of a Tree".
+##' @param title.colour colour of the title of the rktree plot;
+##'                     default title colour is "Dark Blue".
 ##' # side note: (YES, the author likes dark blue)
 ##' @return A rktree igraph plot.
 ##' @examples
@@ -18,17 +24,21 @@
 ##' ## load the forestRK package
 ##' library(forestRK)
 ##'
-##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),] # covariates of training data set
+##' # covariates of training data set
+##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),]
 ##' y.train <- y.organizer(iris[c(1:25,51:75,101:125),5])$y.new
 ##'
 ##' y.factor.levels <- y.organizer(iris[c(1:25,51:75,101:125),5])$y.factor.levels
 ##'
 ##' ## Construct a tree
-##' # min.num.obs.end.node.tree is set to 5 by default; entropy is set to TRUE by default
+##' # min.num.obs.end.node.tree is set to 5 by default;
+##' # entropy is set to TRUE by default
 ##' tree.entropy <- construct.treeRK(x.train, y.train)
 ##'
 ##' # Plot the tree
-##' draw.treeRK(tree.entropy, y.factor.levels, font="Times", node.colour = "black", text.colour = "white", text.size = 0.7, tree.vertex.size = 100, tree.title = "Decision Tree", title.colour = "dark green")
+##' draw.treeRK(tree.entropy, y.factor.levels, font="Times", node.colour = "black",
+##'             text.colour = "white", text.size = 0.7, tree.vertex.size = 100,
+##'             tree.title = "Decision Tree", title.colour = "dark green")
 draw.treeRK <- function(tr = construct.treeRK(), y.factor.levels, font = "Times", node.colour = "white", text.colour = "dark blue", text.size = 0.67, tree.vertex.size = 75, tree.title = "Diagram of a Tree", title.colour = "dark blue"){
 
     ## Sanity check

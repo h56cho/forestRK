@@ -1,35 +1,58 @@
 ##' A pred.forestRK function
 ##'
 ##' @author Hyunjin Cho, Rebecca Su
-##' @title Makes predictions on the test dataset based on the forestRK model constructed from the training dataset.
-##' @param x.test a numericized data frame (obtained via x.organizer()) that stores covariates of the data points on which we want to make our predictions; x.test should contain no NA or NaN's.
-##' @param x.training a numericized data frame that stores covariates of the training data points (or the dataset from which the forestRK model will be generated); x.training should contain no NA or NaN's.
-##' @param y.training a vector that stores numericized class types y of the training observations; y.training should contain no NA or NaN's.
-##' @param min.num.obs.end.node.tree the minimum number of observations that we want each end node of each tree to contain. Default is set to 5.
+##' @title Makes predictions on the test dataset based on the forestRK model
+##'        constructed from the training dataset.
+##' @param x.test a numericized data frame (obtained via x.organizer()) that
+##'               stores covariates of the data points on which we want to make
+##'               our predictions; x.test should contain no NA or NaN's.
+##' @param x.training a numericized data frame that stores covariates of the
+##'                   training data points (or the dataset from which the
+##'                   forestRK model will be generated); x.training should
+##'                   contain no NA or NaN's.
+##' @param y.training a vector that stores numericized class types y of the
+##'                   training observations; y.training should contain no NA or
+##'                   NaN's.
+##' @param min.num.obs.end.node.tree the minimum number of observations that we
+##'                                  want each end node of each tree to contain.
+##'                                  Default is set to 5.
 ##' @param nbags the number of bootstrap samples that we want to generate.
 ##' @param samp.size the number of samples that each bootstrap sample should contain.
 ##' @param y.factor.levels output of y.organizer()$y.factor.levels.
-##' @param entropy TRUE if we use entropy as the splitting criteria; FALSE if we use the gini index for the splitting criteria. Default is set to TRUE.
+##' @param entropy TRUE if we use entropy as the splitting criteria;
+##'                FALSE if we use the gini index for the splitting criteria.
+##'                Default is set to TRUE.
 ##' @return x.test (x.test).
-##' @return a data frame storing predicted classes for all test observations from each tree in the forest (df.of.predictions.for.all.observations).
+##' @return a data frame storing predicted classes for all test observations
+##'         from each tree in the forest (df.of.predictions.for.all.observations).
 ##' @return a forestRK object (forest.rk).
-##' @return a list of data frames that store covariates of the test observations as well as their predicted class from each tree in the random forest (test.prediction.df.list).
-##' @return a data frame displaying names of the predicted class by the forestRK model for each test observation (predictions.forest.rk).
+##' @return a list of data frames that store covariates of the test observations
+##'         as well as their predicted class from each tree in the random forest
+##'         (test.prediction.df.list).
+##' @return a data frame displaying names of the predicted class by the forestRK
+##'         model for each test observation (predictions.forest.rk).
 ##' @return numericized version of predictions.forest.rk (num.pred.for.obs.forest.rk).
-##' @return status of the parameter 'entropy'; TRUE if Entropy is used, FALSE if Gini Index is used (entropy.status).
+##' @return status of the parameter 'entropy';
+##'         TRUE if Entropy is used,
+##'         FALSE if Gini Index is used (entropy.status).
 ##' @examples
 ##' ## example: iris dataset
 ##' ## load the forestRK package
 ##' library(forestRK)
 ##'
-##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),] # covariates of training data set
-##' x.test <- x.organizer(iris[,1:4], encoding = "num")[c(26:50,76:100,126:150),] # covariates of test dataset
+##' # covariates of training data set
+##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),]
+##' # covariates of test dataset
+##' x.test <- x.organizer(iris[,1:4], encoding = "num")[c(26:50,76:100,126:150),]
 ##' y.train <- y.organizer(iris[c(1:25,51:75,101:125),5])$y.new
 ##'
 ##' y.factor.levels<- y.organizer(iris[c(1:25,51:75,101:125),5])$y.factor.levels
 ##'
 ##' ## make prediction from a random forest RK model
-##' pred.forest.rk <- pred.forestRK(x.test = x.test, x.training = x.train, y.training = y.train, y.factor.levels, min.num.obs.end.node.tree = 6, nbags = 100, samp.size = 50, entropy = FALSE)
+##' pred.forest.rk <- pred.forestRK(x.test = x.test, x.training = x.train,
+##'                                 y.training = y.train, y.factor.levels,
+##'                                 min.num.obs.end.node.tree = 6, nbags = 100,
+##'                                 samp.size = 50, entropy = FALSE)
 ##' pred.forest.rk$test.prediction.df.list[[10]]
 ##' pred.forest.rk$pred.for.obs.forest.rk # etc....
 pred.forestRK <- function(x.test = data.frame(), x.training = data.frame(), y.training = c(),
@@ -120,7 +143,7 @@ pred.forestRK <- function(x.test = data.frame(), x.training = data.frame(), y.tr
 
     pred.for.obs.forest.rk <- as.data.frame(pred.for.obs.forest.rk)# a data frame that has its column name as "pred.for.obs.forest.rk"
     rownames(pred.for.obs.forest.rk) <- rownames(test.prediction.df.list[[1]])
-    
+
     ## 3) Return the results
     results <- list(x.test, df.of.predictions.for.all.observations, forest.rk, test.prediction.df.list, pred.for.obs.forest.rk, num.pred.for.obs.forest.rk, ent.status)
     names(results) <- c("x.test", "df.of.predictions.for.all.observations", "forest.rk", "test.prediction.df.list", "pred.for.obs.forest.rk", "num.pred.for.obs.forest.rk", "entropy.status")

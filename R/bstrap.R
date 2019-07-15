@@ -2,18 +2,24 @@
 ##'
 ##' @author Hyunjin Cho, Rebecca Su
 ##' @title Performs bootstrap sampling of our (training) dataset.
-##' @param dat a numericized data frame that stores covariate of the observations as well as their numericized class types y; dat should contain no NA or NaN's.
-##' @param nbags the number of bags or number of bootstrap samples that we want to generate.
-##' @param samp.size the number of samples that each bag (individual bootstrap sample) should contain.
+##' @param dat a numericized data frame that stores covariate of the observations
+##'            as well as their numericized class types y; dat should contain no
+##'            NA or NaN's.
+##' @param nbags the number of bags or number of bootstrap samples that we want
+##'              to generate.
+##' @param samp.size the number of samples that each bag (individual bootstrap sample)
+##'                  should contain.
 ##' @return A list containing a data frames of bootstrap samples.
 ##' @examples
 ##' ## example: iris dataset
 ##' ## load the forestRK package
 ##' library(forestRK)
 ##'
-##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),] # covariates of training data set
+##' # covariates of training data set
+##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),]
 ##' y.train <- y.organizer(iris[c(1:25,51:75,101:125),5])$y.new
-##' b <- data.frame(cbind(x.train, y.train)) # combine the covariates x with class types y
+##' # combine the covariates x with class types y
+##' b <- data.frame(cbind(x.train, y.train))
 ##'
 ##' ## bstrp function example
 ##' bootstrap.sample <- bstrap(dat = b, nbags = 20, samp.size = 30)

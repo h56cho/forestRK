@@ -1,20 +1,25 @@
 ##' A var.used.forestRK function
 ##'
 ##' @author Hyunjin Cho, Rebecca Su
-##' @title Spits out the list of covariates used to perform the splits to generate a particular tree(s) of a forestRK object.
+##' @title Spits out the list of covariates used to perform the splits to
+##'        generate a particular tree(s) of a forestRK object.
 ##' @param forestRK.object a forestRK object.
-##' @param tree.index a vector storing the indices of the trees that we are interested to examine.
-##' @return a list of vectors of names of covariates that was used for the splits to construct the given tree(s) in a forestRK model.
+##' @param tree.index a vector storing the indices of the trees that we are
+##'                   interested to examine.
+##' @return a list of vectors of names of covariates that was used for the splits
+##'         to construct the given tree(s) in a forestRK model.
 ##' @examples
 ##' ## example: iris dataset
 ##' ## load the forestRK package
 ##' library(forestRK)
 ##'
-##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),] # covariates of training data set
+##' # covariates of training data set
+##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),]
 ##' y.train <- y.organizer(iris[c(1:25,51:75,101:125),5])$y.new
 ##'
 ##' #random forest
-##' # min.num.obs.end.node.tree is set to 5 by default; entropy is set to TRUE by default
+##' # min.num.obs.end.node.tree is set to 5 by default;
+##' # entropy is set to TRUE by default
 ##' forestRK.1 <- forestRK(x.train, y.train, nbags=100, samp.size=100)
 ##'
 ##' # prediction from a random forest RK

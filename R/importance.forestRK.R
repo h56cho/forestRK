@@ -3,20 +3,27 @@
 ##' @author Hyunjin Cho, Rebecca Su
 ##' @title Calculates importance of each covariate considered in the forestRK model.
 ##' @param forestRK.object a forestRK object.
-##' @return a vector containing the list of covariate names ordered from the most important to the least important (importance.covariate.names).
-##' @return a vector that contains average decrease in splitting criteria across all trees of the random forest by each covariate (average.decrease.in.criteria.vec).
-##' @return a boolean variable that is TRUE is entropy is used, and is FALSE if Gini Index is used (ent.status).
-##' @return the dataset containing covariate values that was used to construct forestRK.object (x.original).
+##' @return a vector containing the list of covariate names ordered from the most
+##'         important to the least important (importance.covariate.names).
+##' @return a vector that contains average decrease in splitting criteria across
+##'         all trees of the random forest by each covariate
+##'         (average.decrease.in.criteria.vec).
+##' @return a boolean variable that is TRUE is entropy is used, and is FALSE if
+##'         Gini Index is used (ent.status).
+##' @return the dataset containing covariate values that was used to construct
+##'         forestRK.object (x.original).
 ##' @examples
 ##' ## example: iris dataset
 ##' ## load the forestRK package
 ##' library(forestRK)
 ##'
-##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),] # covariates of training data set
+##' # covariates of training data set
+##' x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),]
 ##' y.train <- y.organizer(iris[c(1:25,51:75,101:125),5])$y.new
 ##'
 ##' # random forest
-##' # min.num.obs.end.node.tree is set to 5 by default; entropy is set to TRUE by default
+##' # min.num.obs.end.node.tree is set to 5 by default;
+##' # entropy is set to TRUE by default
 ##' forestRK.1 <- forestRK(x.train, y.train, nbags=100, samp.size=100)
 ##' # execute importance.forestRK function
 ##' imp <- importance.forestRK(forestRK.1)
@@ -31,7 +38,7 @@ importance.forestRK <- function(forestRK.object = forestRK()){
     x.ori <- forestRK.object$X
     ent.status <- forestRK.object$ent.status
     tree.list  <- forestRK.object$forest.rk.tree.list
-    
+
     # reminder: a tree object contains: ("a", "x.node.list","y.new.node.list","flag","covariate.split","value.at.split","amount.decrease.entropy")
     length.forest.rk.tree.list <- length(tree.list) #number of trees in the random forest
     n.covariates <- dim(x.ori)[2] #total number of covariates from our original dataset
@@ -79,4 +86,3 @@ importance.forestRK <- function(forestRK.object = forestRK()){
     ## 6) Return the results
     results
 }
-  
