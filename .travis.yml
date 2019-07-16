@@ -2,4 +2,4 @@ os:
 - osx
 - linux
 language: r
-bundler_args: --retry 6
+bundler_args: --retry 10
