@@ -1,8 +1,8 @@
 Package: forestRK
 Version: 0.0-1
 Encoding: UTF-8
-Title: Implements the forestRK Algorithm for Classification Problems
-Description: The forestRK package provides functions that calculates common types of splitting criteria used in random forests for classification problems (entropy, Gini Index), as well as functions that make predictions based on a single tree or a forestRK model; the package also provides functions to generate importance plot for a forestRK model, as well as the 2D multidimenslionl-scaling (mds) plot of data points that are colour coded by their predicted class types by the forestRK model.  
+Title: Implements the Forest-RK Algorithm for Classification Problems
+Description: The forestRK package provides functions that calculates common types of splitting criteria used in random forests for classification problems (entropy, gini index), as well as functions that make predictions based on a single tree or a Forest-RK model; the package also provides functions to generate importance plot for a Forest-RK model, as well as the 2D multidimensional-scaling plot of data points that are colour coded by their predicted class types by the Forest-RK model.  
 Authors@R: c(person("Hyunjin", "Cho", email = "h56cho@uwaterloo.ca", role = c("aut", "cre")), 
              person("Rebecca", "Su", email = "y57su@uwaterloo.ca", role = "ctb"))
 Author: Hyunjin Cho [aut, cre], Rebecca Su [ctb]
