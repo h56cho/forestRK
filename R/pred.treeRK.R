@@ -103,7 +103,7 @@ pred.treeRK <- function(X = data.frame(), rktree = construct.treeRK()){
             ## (recall: covariate.split and value.at.split are determined from fitting a tree on the training dataset)
             if(length(which(tf.vec == TRUE)) == 0){
                 if(!is.null(X.node.list[[l2]])){
-            	    sp <- partysplit(varid = covariate.split[i], breaks = value.at.split[i], right = TRUE)
+            	      sp <- partysplit(varid = covariate.split[i], breaks = value.at.split[i], right = TRUE)
                   	split.record <- kidids_split(sp, data = X.node.list[[l2]])
                   	pos <- which(split.record == 1)
 

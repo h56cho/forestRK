@@ -79,8 +79,6 @@
   ## load the forestRK package
   library(forestRK)
 
-  x.ex <- x.organizer(iris[,1:4])
-
   # covariates of training data set
   x.train <- x.organizer(iris[,1:4], encoding = "num")[c(1:25,51:75,101:125),]
   y.train <- y.organizer(iris[c(1:25,51:75,101:125),5])$y.new
