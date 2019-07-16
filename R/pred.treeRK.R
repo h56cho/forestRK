@@ -102,33 +102,70 @@ pred.treeRK <- function(X = data.frame(), rktree = construct.treeRK()){
             ## split the test set at the covariate and the value specified in the matrices covariate.split and value.at.split.
             ## (recall: covariate.split and value.at.split are determined from fitting a tree on the training dataset)
             if(length(which(tf.vec == TRUE)) == 0){
-            	sp <- partysplit(varid = covariate.split[i], breaks = value.at.split[i], right = TRUE)
-            	split.record <- kidids_split(sp, data = X.node.list[[l2]])
-            	pos <- which(split.record == 1)
+                if(!is.null(X.node.list[[l2]])){
+            	    sp <- partysplit(varid = covariate.split[i], breaks = value.at.split[i], right = TRUE)
+                  	split.record <- kidids_split(sp, data = X.node.list[[l2]])
+                  	pos <- which(split.record == 1)
 
-                ## case (i): if the split given by covariate.split and value.at.split do not make one of the children nodes to be empty...
-                if(length(pos) != 0 && length(pos) != dim(X.node.list[[l2]])[1]){
-                    # split the current X.node (recall: 'X.node' == node of the test set; 'x.node' == node of the training set)
-                    x1 <- X.node.list[[l2]][pos,]
-                    x2 <- X.node.list[[l2]][-pos,]
-                    X.node.list[length(X.node.list)+1] <- list(x1)
-                    X.node.list[length(X.node.list)+1] <- list(x2)
+                    ## case (i): if the split given by covariate.split and value.at.split do not make one of the children nodes to be empty...
+                    if(length(pos) != 0 && length(pos) != dim(X.node.list[[l2]])[1]){
+                        # split the current X.node (recall: 'X.node' == node of the test set; 'x.node' == node of the training set)
+                        x1 <- X.node.list[[l2]][pos,]
+                        x2 <- X.node.list[[l2]][-pos,]
+                        X.node.list[length(X.node.list)+1] <- list(x1)
+                        X.node.list[length(X.node.list)+1] <- list(x2)
 
-                    # save information by updating flags
-                    flag.pred <- rbind(flag.pred, paste0(flag.pred[a-1],"x"))
-                    flag.pred <- rbind(flag.pred, paste0(flag.pred[a-1],"y"))
+                        # save information by updating flags
+                        flag.pred <- rbind(flag.pred, paste0(flag.pred[a-1],"x"))
+                        flag.pred <- rbind(flag.pred, paste0(flag.pred[a-1],"y"))
 
-                    # update the values of 'l2', 'i', and 'a' after splitting the test set
-                    l2 <- l2 + 1
-                    i <- i + 1
-                    a <- a + 1
-                } # end of if(length(pos) != 0 && length(pos) != dim(X.node.list[[l2]])[1])
+                        # update the values of 'l2', 'i', and 'a' after splitting the test set
+                        l2 <- l2 + 1
+                        i <- i + 1
+                        a <- a + 1
+                    } # end of if(length(pos) != 0 && length(pos) != dim(X.node.list[[l2]])[1])
 
-                ## case (ii): if the split given by covariate.split and value.at.split make the left child nodes to be empty (else if(length(pos) == 0))...
-                else if(length(pos) == 0){
-                    x1 <- NULL # assign NULL as the left child node (x1)
-                    x2 <- X.node.list[[l2]] # assign the entire parent node as the right child node
-                    # update X.node.list
+                    ## case (ii): if the split given by covariate.split and value.at.split make the left child nodes to be empty (else if(length(pos) == 0))...
+                    else if(length(pos) == 0){
+                        x1 <- NULL # assign NULL as the left child node (x1)
+                        x2 <- X.node.list[[l2]] # assign the entire parent node as the right child node
+                        # update X.node.list
+                        X.node.list[length(X.node.list)+1] <- list(x1)
+                        X.node.list[length(X.node.list)+1] <- list(x2)
+
+                        # save information by updating flags
+                        flag.pred <- rbind(flag.pred, paste0(flag.pred[a-1],"x"))
+                        flag.pred <- rbind(flag.pred, paste0(flag.pred[a-1],"y"))
+
+                        # update the values of 'l2', 'i', and 'a'
+                        l2 <- l2 + 1
+                        i <- i + 1
+                        a <- a + 1
+                    } # end of else if(length(pos) == 0)
+
+                    ## case (iii): if the split given by covariate.split and value.at.split make the right child nodes to be empty
+                    ## (else if(length(pos) == dim(X.node.list[[l2]])[1]))...
+                    else if(length(pos) == dim(X.node.list[[l2]])[1]){
+                        x1 <- X.node.list[[l2]] # assign the entire parent node as the left child node
+                        x2 <- NULL # assign NULL as the right child node (x1)
+                        # Update the X.node.list
+                        X.node.list[length(X.node.list)+1] <- list(x1)
+                        X.node.list[length(X.node.list)+1] <- list(x2)
+
+                        # save information by updating flags
+                        flag.pred <- rbind(flag.pred, paste0(flag.pred[a-1],"x"))
+                        flag.pred <- rbind(flag.pred, paste0(flag.pred[a-1],"y"))
+
+                        # update the values of 'l2', 'i', and 'a'
+                        l2 <- l2 + 1
+                        i <- i + 1
+                        a <- a + 1
+                    } # end of else if(length(pos) == dim(X.node.list[[l2]])[1])
+                } # end of if(!is.null(X.node.list[[l2]]))
+
+                else{
+                    x1 <- NULL
+                    x2 <- NULL
                     X.node.list[length(X.node.list)+1] <- list(x1)
                     X.node.list[length(X.node.list)+1] <- list(x2)
 
@@ -140,28 +177,8 @@ pred.treeRK <- function(X = data.frame(), rktree = construct.treeRK()){
                     l2 <- l2 + 1
                     i <- i + 1
                     a <- a + 1
-                } # end of else if(length(pos) == 0)
-
-                ## case (iii): if the split given by covariate.split and value.at.split make the right child nodes to be empty
-                ## (else if(length(pos) == dim(X.node.list[[l2]])[1]))...
-                else if(length(pos) == dim(X.node.list[[l2]])[1]){
-                    x1 <- X.node.list[[l2]] # assign the entire parent node as the left child node
-                    x2 <- NULL # assign NULL as the right child node (x1)
-                    # Update the X.node.list
-                    X.node.list[length(X.node.list)+1] <- list(x1)
-                    X.node.list[length(X.node.list)+1] <- list(x2)
-
-                    # save information by updating flags
-                    flag.pred <- rbind(flag.pred, paste0(flag.pred[a-1],"x"))
-                    flag.pred <- rbind(flag.pred, paste0(flag.pred[a-1],"y"))
-
-                    # update the values of 'l2', 'i', and 'a'
-                    l2 <- l2 + 1
-                    i <- i + 1
-                    a <- a + 1
-                } # end of else if(length(pos) == dim(X.node.list[[l2]])[1])
+                }
             } # end of if(length(which(tf.vec == TRUE)) == 0)
-
             ## If the value of l2 is one of the indices of the end nodes of the rktree that we base our classifications on,
             ## do not perform any kind of split, and keep the end node intact (and do not update the index 'i', since we are not performing any split).
             else { l2 <- l2 + 1; a <- a + 1 }
