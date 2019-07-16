@@ -18,4 +18,5 @@ Note: forestRK package is based on
       - The discussion 
         https://stats.stackexchange.com/questions/168964/building-a-regression-tree-with-r-from-scratch/168967#168967 
 RoxygenNote: 6.1.1
-VignetteBuilder: knitr
+Suggests: R.rsp
+VignetteBuilder: R.rsp
