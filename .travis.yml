@@ -1,5 +1,3 @@
-os: 
-- osx
-- linux
+os: osx
 language: r
 bundler_args: --retry 10
