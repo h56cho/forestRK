@@ -1,5 +1,5 @@
 # forestRK
-R package that implements Forest-RK algorithm for classification problems
+R package that implements Forest-RK algorithm for classification problems.
 
 The package forestRK is based on:
 
@@ -15,5 +15,5 @@ For more details about individual functions, please see the forestRK documentati
   
   Documentation files (.Rd) can be found under 'man' folder.
   
-  Vignette RMarkdown file can be found under the 'vignette' folder.
+  Vignette can be found under the 'vignette' folder.
   
