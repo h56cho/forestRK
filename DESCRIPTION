@@ -1,5 +1,5 @@
 Package: forestRK
-Version: 0.0-4
+Version: 0.0-5
 Encoding: UTF-8
 Title: Implements the Forest-R.K. Algorithm for Classification Problems
 Description: Provides functions that calculates common types of splitting
@@ -13,11 +13,14 @@ Description: Provides functions that calculates common types of splitting
     "Forest-R.K.: A New Random Forest Induction Method", 
     Fourth International Conference on Intelligent Computing,
     September 2008, Shanghai, China, pp.430-437.
-Authors@R: c(person("Hyunjin", "Cho", email = "h56cho@uwaterloo.ca", role = c("aut", "cre")), person("Rebecca", "Su", email = "y57su@uwaterloo.ca", role = "ctb"))
+Authors@R: c(
+    person("Hyunjin", "Cho", email = "h56cho@uwaterloo.ca", role = c("aut","cre")),
+    person("Rebecca", "Su", email = "y57su@uwaterloo.ca", role = "ctb"))
 Author: Hyunjin Cho [aut, cre], Rebecca Su [ctb]
 Maintainer: Hyunjin Cho <h56cho@uwaterloo.ca> 
 Depends: R (>= 3.6.0) 
-Imports: igraph, ggplot2, rapportools, partykit, stats, graphics, pkgKitten, knitr, mlbench
+Imports: igraph, ggplot2, rapportools, partykit, stats, graphics, pkgKitten, 
+    knitr, mlbench
 License: GPL (>= 3) | file LICENSE
 Repository: CRAN
 Note: The package is also based on the discussion https://stats.stackexchange.com/questions/168964/building-a-regression-tree-with-r-from-scratch/168967#168967 
