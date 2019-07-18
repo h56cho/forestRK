@@ -102,6 +102,7 @@ pred.treeRK <- function(X = data.frame(), rktree = construct.treeRK()){
             ## split the test set at the covariate and the value specified in the matrices covariate.split and value.at.split.
             ## (recall: covariate.split and value.at.split are determined from fitting a tree on the training dataset)
             if(length(which(tf.vec == TRUE)) == 0){
+                ## If the current node is not specified as NULL...
                 if(!is.null(X.node.list[[l2]])){
             	      sp <- partysplit(varid = covariate.split[i], breaks = value.at.split[i], right = TRUE)
                   	split.record <- kidids_split(sp, data = X.node.list[[l2]])
@@ -163,6 +164,8 @@ pred.treeRK <- function(X = data.frame(), rktree = construct.treeRK()){
                     } # end of else if(length(pos) == dim(X.node.list[[l2]])[1])
                 } # end of if(!is.null(X.node.list[[l2]]))
 
+				## If the current node IS specified as NULL...
+				## simply assign its children nodes as NULL as well.
                 else{
                     x1 <- NULL
                     x2 <- NULL

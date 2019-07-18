@@ -120,7 +120,9 @@ draw.treeRK <- function(tr = construct.treeRK(), y.factor.levels, font = "Times"
 
 
     ## 5) Plot the graph
-    par(mar = c(0,0,0,0), ps=14,cex=1)
+    opar <- par(mar = c(0,0,0,0), ps=14,cex=1)
+    on.exit(par(opar))
+
     V(i.graph)$class <- names(V(i.graph))
 
     g <- {
