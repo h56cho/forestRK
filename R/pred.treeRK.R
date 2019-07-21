@@ -164,8 +164,8 @@ pred.treeRK <- function(X = data.frame(), rktree = construct.treeRK()){
                     } # end of else if(length(pos) == dim(X.node.list[[l2]])[1])
                 } # end of if(!is.null(X.node.list[[l2]]))
 
-				## If the current node IS specified as NULL...
-				## simply assign its children nodes as NULL as well.
+                ## If the current node IS specified as NULL...
+				        ## simply assign its children nodes as NULL as well.
                 else{
                     x1 <- NULL
                     x2 <- NULL
